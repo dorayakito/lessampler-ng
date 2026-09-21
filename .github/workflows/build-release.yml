@@ -61,17 +61,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential cmake ninja-build gcc g++
 
-      - name: Configure CMake (Linux & macOS)
-        if: runner.os != 'Windows'
+      - name: Configure CMake
         run: |
-          cmake -B build \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_POLICY_VERSION_MINIMUM=3.5
-
-      - name: Configure CMake (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
 
       - name: Build Executable
         run: |

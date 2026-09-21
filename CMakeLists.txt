@@ -4,6 +4,14 @@ cmake_minimum_required(VERSION 3.16)
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5 CACHE STRING "" FORCE)
 
 # Auto-patch submodules for C++20 compatibility on clean checkouts
+if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/lib/inicpp/include/inicpp/types.h")
+    file(READ "${CMAKE_CURRENT_SOURCE_DIR}/lib/inicpp/include/inicpp/types.h" _inicpp_types)
+    if (NOT _inicpp_types MATCHES "#include <cstdint>")
+        string(REPLACE "#include <variant>" "#include <variant>\n#include <cstdint>" _inicpp_types "${_inicpp_types}")
+        file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/lib/inicpp/include/inicpp/types.h" "${_inicpp_types}")
+    endif ()
+endif ()
+
 if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/lib/inicpp/include/inicpp/option.h")
     file(READ "${CMAKE_CURRENT_SOURCE_DIR}/lib/inicpp/include/inicpp/option.h" _inicpp_content)
     if (NOT _inicpp_content MATCHES "add_to_list<ValueType>")
