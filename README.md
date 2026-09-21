@@ -4,6 +4,7 @@
   <p><b>High-Performance Singing Voice Synthesizer & Resampler for UTAU / OpenUtau</b></p>
 
   <p>
+    <a href="https://dorayakito.github.io/lessampler-ng/"><img src="https://img.shields.io/badge/Docs%20%26%20Demos-GitHub%20Pages-informational" alt="Documentation"></a>
     <a href="https://github.com/dorayakito/lessampler-ng/releases"><img src="https://img.shields.io/github/v/release/dorayakito/lessampler-ng?color=blue&label=Release" alt="Release"></a>
     <img src="https://img.shields.io/badge/C%2B%2B-20-blue.svg" alt="C++20">
     <img src="https://img.shields.io/badge/CMake-3.16%2B-brightgreen.svg" alt="CMake">
