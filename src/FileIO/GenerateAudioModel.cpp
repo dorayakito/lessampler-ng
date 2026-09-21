@@ -8,10 +8,6 @@
  * along with lessampler. If not, see <http://www.gnu.org/licenses/>.
  */
 
-//
-// Created by gloom on 2022/5/23.
-//
-
 #include <utility>
 #include <future>
 #include <thread>
@@ -21,7 +17,6 @@
 #include "Utils/LOG.h"
 #include "AudioModel/AudioModel.h"
 #include "AudioModel/lessAudioModel.h"
-#include "AudioProcess/AutoAMP.h"
 #include "FileIO/AudioModelIO.h"
 #include "FileIO/WavIO.h"
 
@@ -62,18 +57,14 @@ void GenerateAudioModel::WavFileModel(const std::filesystem::path &wav_path) {
     auto x = new double[x_length];
     auto fs = WavIO::WavRead(wav_path.string().c_str(), x);
 
-    // Check weather need to apply amp before modeling
-    if (configure.model_amp != 0.0) {
-        YALL_DEBUG_ << "Apply AMP Before Modeling";
-        AutoAMP amp(x, x_length, configure.model_amp);
-        x = amp.GetAMP();
-    }
-
+    // Pass pure un-mangled PCM signal to AudioModel for high precision WORLD analysis
     AudioModel audioModel(x, x_length, fs, configure);
     auto model = audioModel.GetAudioModel();
 
     AudioModelIO audioModelIO(wav_path.string(), model, configure);
     audioModelIO.SaveAudioModel();
+
+    delete[] x;
 }
 
 void GenerateAudioModel::GenerateModelFromFile() {
@@ -129,4 +120,3 @@ template<class I, class F>
 void GenerateAudioModel::for_each(I begin, I end, F f) {
     for_each(std::lround(std::thread::hardware_concurrency() / 2), begin, end, f);
 }
-

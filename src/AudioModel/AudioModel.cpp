@@ -8,15 +8,11 @@
  * along with lessampler. If not, see <http://www.gnu.org/licenses/>.
  */
 
-//
-// Created by gloom on 2022/5/2.
-//
 #include "AudioModel.h"
 #include "WorldModule/WorldModule.h"
 
 AudioModel::AudioModel(double *x, int x_length, int fs, const lessConfigure &configure) : configure(configure) {
-    _lessAudioModel.x.resize(x_length);
-    _lessAudioModel.x.insert(_lessAudioModel.x.end(), x, x + x_length);
+    _lessAudioModel.x.assign(x, x + x_length);
     _lessAudioModel.fs = fs;
 
     // initialize the audio model from x, x_length, fs using World Vocoder
@@ -33,11 +29,8 @@ void AudioModel::InitAudioModel() {
     _lessAudioModel.fft_size = worldPara.fft_size;
     _lessAudioModel.frame_period = worldPara.frame_period;
 
-    _lessAudioModel.f0.resize(worldPara.f0_length);
-    _lessAudioModel.f0.insert(_lessAudioModel.f0.end(), worldPara.f0, worldPara.f0 + worldPara.f0_length);
-
-    _lessAudioModel.time_axis.resize(worldPara.f0_length);
-    _lessAudioModel.time_axis.insert(_lessAudioModel.time_axis.end(), worldPara.time_axis, worldPara.time_axis + worldPara.f0_length);
+    _lessAudioModel.f0.assign(worldPara.f0, worldPara.f0 + worldPara.f0_length);
+    _lessAudioModel.time_axis.assign(worldPara.time_axis, worldPara.time_axis + worldPara.f0_length);
 
     _lessAudioModel.w_length = worldPara.fft_size / 2 + 1;
 

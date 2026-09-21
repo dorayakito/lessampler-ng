@@ -8,12 +8,9 @@
  * along with lessampler. If not, see <http://www.gnu.org/licenses/>.
  */
 
-//
-// Created by gloom on 2022/5/21.
-//
-
 #include <cmath>
 #include <utility>
+#include <algorithm>
 
 #include "AutoAMP.h"
 #include "Utils/LOG.h"
@@ -31,7 +28,7 @@ AutoAMP::AutoAMP(ShinePara shine, double *x) : shine(std::move(shine)) {
     SetDefaultValue();
     YALL_DEBUG_ << "The Default PCM is: " + std::to_string(sample_value);
 
-    YALL_DEBUG_ << "Diminished Consonant Fricative...";
+    YALL_DEBUG_ << "Applying AutoAMP...";
     DiminishedConsonantFricative();
 
     YALL_DEBUG_ << "Limit maximum amplitude";
@@ -45,9 +42,7 @@ AutoAMP::AutoAMP(double *x, int x_length, double amp_val) {
     YALL_DEBUG_ << "The X_LENGTH is: " + std::to_string(x_length);
     GetMaxAMP();
     YALL_DEBUG_ << "Get Max AMP is: " + std::to_string(MaxAMP);
-    YALL_DEBUG_ << "Diminished Consonant Fricative...";
     DiminishedConsonantFricative(amp_val);
-    YALL_DEBUG_ << "Limit maximum amplitude";
     LimitMaximumAmplitude();
 }
 
@@ -56,10 +51,12 @@ double *AutoAMP::GetAMP() {
 }
 
 void AutoAMP::GetMaxAMP() {
-    for (int i = 0; i < x_length - 1; ++i) {
-        if (!std::isnan(x[i])) {
-            if (MaxAMP < std::abs(x[i])) {
-                MaxAMP = std::abs(x[i]);
+    MaxAMP = 0.0;
+    for (int i = 0; i < x_length; ++i) {
+        if (!std::isnan(x[i]) && !std::isinf(x[i])) {
+            double abs_val = std::abs(x[i]);
+            if (abs_val > MaxAMP) {
+                MaxAMP = abs_val;
             }
         }
     }
@@ -69,28 +66,33 @@ void AutoAMP::GetMaxAMP() {
 }
 
 void AutoAMP::SetDefaultValue() {
-    // TODO: This is a UTAU flag
     sample_value = default_sample_value;
 }
 
 void AutoAMP::DiminishedConsonantFricative() {
+    double target_gain = 0.95 * (shine.volumes > 0.0 ? shine.volumes : 1.0);
+    double factor = (MaxAMP > 1e-6) ? (target_gain / MaxAMP) : 1.0;
+    if (factor > 4.0) factor = 4.0;
+
     for (int i = 0; i < x_length; ++i) {
-        // remove blank fricatives
-        if (std::isnan(x[i])) {
+        if (std::isnan(x[i]) || std::isinf(x[i])) {
             x_out[i] = 0.0;
         } else {
-            x_out[i] = x[i] * 0.5 * shine.volumes / MaxAMP;
+            x_out[i] = x[i] * factor;
         }
     }
 }
 
 void AutoAMP::DiminishedConsonantFricative(double amp_volumes) {
+    double target_gain = 0.95 * amp_volumes;
+    double factor = (MaxAMP > 1e-6) ? (target_gain / MaxAMP) : 1.0;
+    if (factor > 4.0) factor = 4.0;
+
     for (int i = 0; i < x_length; ++i) {
-        // remove blank fricatives
-        if (std::isnan(x[i])) {
+        if (std::isnan(x[i]) || std::isinf(x[i])) {
             x_out[i] = 0.0;
         } else {
-            x_out[i] = x[i] * 0.5 * amp_volumes / MaxAMP;
+            x_out[i] = x[i] * factor;
         }
     }
 }
