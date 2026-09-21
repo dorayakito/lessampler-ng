@@ -1,0 +1,20 @@
+add_library(TUI
+        TUI.cpp
+        TUI.h
+)
+
+target_link_libraries(TUI
+        PUBLIC
+        component
+        dom
+        screen
+        Dialogs
+        FileIO
+        AudioModel
+        AudioProcess
+        AudioModelSynthesis
+        Shine
+        UTAU
+        ConfigUnit
+        Threads::Threads
+)

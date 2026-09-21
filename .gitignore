@@ -1,5 +1,6 @@
+.cache/
+build/
 
-# Created by https://www.gitignore.io/api/c,c++,xcode,cmake,macos,jetbrains
 # Edit at https://www.gitignore.io/?templates=c,c++,xcode,cmake,macos,jetbrains
 
 ### C ###

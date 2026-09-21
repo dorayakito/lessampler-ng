@@ -20,6 +20,7 @@
 #include "FileIO/GenerateAudioModel.h"
 #include "FileIO/WavIO.h"
 #include "ConfigUnit/ConfigVoiceBank.h"
+#include "TUI/TUI.h"
 
 #include "lessconfig.h"
 #include "StaticCast.h"
@@ -49,11 +50,9 @@ void lessampler::show_logo() {
 }
 
 bool lessampler::ParseArgs() {
-    // Basic Open
-    if (argc < 2) {
-        show_logo();
-        Dialogs::notify("lessampler: Configure", "lessampler");
-        // ADD Qt/TUI
+    // Basic Open or interactive flag -> Launch TUI
+    if (argc < 2 || (argc == 2 && (std::string(argv[1]) == "-i" || std::string(argv[1]) == "--tui" || std::string(argv[1]) == "--gui"))) {
+        TUI::Launch(configure, exec_path);
         return false;
     }
 

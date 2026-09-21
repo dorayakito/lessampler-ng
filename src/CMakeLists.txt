@@ -4,6 +4,7 @@ add_subdirectory(Dialogs)
 add_subdirectory(FileIO)
 add_subdirectory(Shine)
 add_subdirectory(AudioProcess)
+add_subdirectory(TUI)
 
 file(GLOB lessampler_source *.cpp *.h)
 
@@ -14,7 +15,7 @@ else ()
     add_executable(lessampler ${lessampler_source})
 endif ()
 
-target_link_libraries(lessampler PRIVATE AudioModel AudioProcess FileIO Dialogs UTAU ConfigUnit Threads::Threads)
+target_link_libraries(lessampler PRIVATE AudioModel AudioProcess FileIO Dialogs UTAU ConfigUnit TUI Threads::Threads)
 
 if (MSVC)
     target_compile_options(lessampler PUBLIC "/utf-8")
