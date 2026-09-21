@@ -8,17 +8,13 @@
  * along with lessampler. If not, see <http://www.gnu.org/licenses/>.
  */
 
-//
-// Created by gloom on 2022/5/20.
-//
-
 #include "Synthesis.h"
 
 #include <utility>
-
+#include <algorithm>
 #include "Utils/LOG.h"
 
-#include <world/synthesisrealtime.h>
+#include <world/synthesis.h>
 
 Synthesis::Synthesis(lessAudioModel audioModel, int x_length) : audioModel(std::move(audioModel)), x_length(x_length) {
     YALL_DEBUG_ << "Allocate Out Memory, Length: " + std::to_string(x_length);
@@ -43,45 +39,38 @@ void Synthesis::AllocateMemory() {
 }
 
 void Synthesis::SynthesisWav() const {
-    WorldSynthesizer synthesizer = {0};
-    int buffer_size = 64;
-    InitializeSynthesizer(audioModel.fs, audioModel.frame_period,
-                          audioModel.fft_size, buffer_size, 100, &synthesizer);
+    if (audioModel.f0.empty() || x_length <= 0) {
+        return;
+    }
 
-    auto f0 = new double[audioModel.f0.size()];
+    int f0_length = static_cast<int>(audioModel.f0.size());
+    auto f0 = new double[f0_length];
     std::copy(audioModel.f0.begin(), audioModel.f0.end(), f0);
-    auto spectrogram = new double *[audioModel.f0.size()];
-    auto aperiodicity = new double *[audioModel.f0.size()];
-    for (int i = 0; i < audioModel.f0.size(); ++i) {
+
+    auto spectrogram = new double *[f0_length];
+    auto aperiodicity = new double *[f0_length];
+    for (int i = 0; i < f0_length; ++i) {
         spectrogram[i] = new double[audioModel.w_length];
         aperiodicity[i] = new double[audioModel.w_length];
         std::copy(audioModel.spectrogram[i].begin(), audioModel.spectrogram[i].end(), spectrogram[i]);
         std::copy(audioModel.aperiodicity[i].begin(), audioModel.aperiodicity[i].end(), aperiodicity[i]);
     }
 
-    int offset = 0;
-    for (int i = 0; i < audioModel.f0.size();) {
-        // Add one frame ('i' shows the frame index that should be added)
-        if (AddParameters(&f0[i], 1, &spectrogram[i], &aperiodicity[i], &synthesizer) == 1) {
-            ++i;
-        }
+    // High quality minimum-phase WORLD synthesis
+    ::Synthesis(f0, f0_length,
+                const_cast<const double * const *>(spectrogram),
+                const_cast<const double * const *>(aperiodicity),
+                audioModel.fft_size,
+                audioModel.frame_period,
+                audioModel.fs,
+                x_length,
+                x);
 
-        // Synthesize speech with length of buffer_size sample.
-        // It is repeated until the function returns 0
-        // (it suggests that the synthesizer cannot generate speech).
-        while (Synthesis2(&synthesizer) != 0) {
-            int index = offset * buffer_size;
-            for (int j = 0; j < buffer_size; ++j)
-                x[j + index] = synthesizer.buffer[j];
-            offset++;
-        }
-
-        // Check the "Lock" (Please see synthesisrealtime.h)
-        if (IsLocked(&synthesizer) == 1) {
-            YALL_WARN_ << "Synthesis Buffer Locked";
-            break;
-        }
+    delete[] f0;
+    for (int i = 0; i < f0_length; ++i) {
+        delete[] spectrogram[i];
+        delete[] aperiodicity[i];
     }
-    DestroySynthesizer(&synthesizer);
+    delete[] spectrogram;
+    delete[] aperiodicity;
 }
-

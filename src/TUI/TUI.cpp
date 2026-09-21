@@ -153,10 +153,11 @@ void TUI::Launch(lessConfigure &configure, const std::filesystem::path &exec_pat
                 "0",            // offset
                 synth_length,   // required length
                 "0",            // fixed part
-                "0",            // unused part
+                "0",            // cutoff / end blank
                 "100",          // volume
-                "120",          // tempo
-                "!120AA#"       // pitch bend
+                "0",            // modulation
+                "!120",         // tempo
+                ""              // pitch bend
             };
 
             std::vector<char *> argv_ptrs;
