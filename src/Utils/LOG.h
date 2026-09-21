@@ -11,6 +11,7 @@
 #ifndef LESSAMPLER_LOG_H
 #define LESSAMPLER_LOG_H
 
+#include <cstdint>
 #include <ColorCout.hpp>
 #include <string>
 #include <vector>

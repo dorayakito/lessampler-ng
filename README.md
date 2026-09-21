@@ -4,7 +4,7 @@
   <p><b>High-Performance Singing Voice Synthesizer & Resampler for UTAU / OpenUtau</b></p>
 
   <p>
-    <a href="https://github.com/dorayakito/lessampler/releases"><img src="https://img.shields.io/github/v/release/dorayakito/lessampler?color=blue&label=Release" alt="Release"></a>
+    <a href="https://github.com/dorayakito/lessampler-ng/releases"><img src="https://img.shields.io/github/v/release/dorayakito/lessampler-ng?color=blue&label=Release" alt="Release"></a>
     <img src="https://img.shields.io/badge/C%2B%2B-20-blue.svg" alt="C++20">
     <img src="https://img.shields.io/badge/CMake-3.16%2B-brightgreen.svg" alt="CMake">
     <a href="LICENSE"><img src="https://img.shields.io/badge/License-LGPLv3-yellow.svg" alt="License: LGPLv3"></a>
@@ -197,8 +197,8 @@ lessampler/
 
 ```bash
 # 1. Clone the repository including all submodules
-git clone --recursive https://github.com/dorayakito/lessampler.git
-cd lessampler
+git clone --recursive https://github.com/dorayakito/lessampler-ng.git
+cd lessampler-ng
 
 # 2. Configure build with CMake
 mkdir build && cd build

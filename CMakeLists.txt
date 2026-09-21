@@ -1,5 +1,33 @@
 cmake_minimum_required(VERSION 3.16)
 
+# Ensure CMake 3.30+ compatibility for older submodules (like World)
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5 CACHE STRING "" FORCE)
+
+# Auto-patch submodules for C++20 compatibility on clean checkouts
+if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/lib/inicpp/include/inicpp/option.h")
+    file(READ "${CMAKE_CURRENT_SOURCE_DIR}/lib/inicpp/include/inicpp/option.h" _inicpp_content)
+    if (NOT _inicpp_content MATCHES "add_to_list<ValueType>")
+        string(REPLACE "for (auto &&item : list) { add_to_list(item); }" "for (auto &&item : list) { add_to_list<ValueType>(item); }" _inicpp_content "${_inicpp_content}")
+        file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/lib/inicpp/include/inicpp/option.h" "${_inicpp_content}")
+    endif ()
+endif ()
+
+if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/lib/ColorCout/includes/ColorCout.hpp")
+    file(READ "${CMAKE_CURRENT_SOURCE_DIR}/lib/ColorCout/includes/ColorCout.hpp" _colorcout_content)
+    if (NOT _colorcout_content MATCHES "#include <cstdint>")
+        string(REPLACE "#include <iostream>" "#include <iostream>\n#include <cstdint>" _colorcout_content "${_colorcout_content}")
+        file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/lib/ColorCout/includes/ColorCout.hpp" "${_colorcout_content}")
+    endif ()
+endif ()
+
+if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/lib/ftxui/cmake/ftxui_set_options.cmake")
+    file(READ "${CMAKE_CURRENT_SOURCE_DIR}/lib/ftxui/cmake/ftxui_set_options.cmake" _ftxui_content)
+    if (_ftxui_content MATCHES "\"-Werror\"")
+        string(REPLACE "target_compile_options(\${library} PRIVATE \"-Werror\")" "# target_compile_options(\${library} PRIVATE \"-Werror\")" _ftxui_content "${_ftxui_content}")
+        file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/lib/ftxui/cmake/ftxui_set_options.cmake" "${_ftxui_content}")
+    endif ()
+endif ()
+
 # Set Version, Release need cmake
 set(PROJECT_VERSION_MAJOR 0)
 set(PROJECT_VERSION_MINOR 0)
